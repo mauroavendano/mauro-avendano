@@ -1,5 +1,9 @@
 package com.mauroave.whatsapp.notificacion;
 
+import com.mauroave.whatsapp.mensaje.Mensaje;
+import com.mauroave.whatsapp.mensaje.MensajeConsume;
+import com.mauroave.whatsapp.mensaje.MensajeResponse;
+import com.mauroave.whatsapp.utils.ObjectUtils;
 import com.mauroave.whatsapp.utils.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +26,15 @@ public class NotificacionService {
         page.setElements(result);
         page.setLength(this.notificacionRepository.count());
         return page;
+    }
+
+    public NotificacionResponse insert(Notificacion consume) {
+        Notificacion entitySaved = this.notificacionRepository.save(consume);
+        return this.transformResponse(entitySaved);
+    }
+
+    public NotificacionResponse transformResponse(Notificacion entity) {
+        return ObjectUtils.convertValue(entity, NotificacionResponse.class);
     }
 
 }

@@ -1,17 +1,23 @@
 package com.mauroave.whatsapp.notificacion;
 
-import com.mauroave.whatsapp.persona.Persona;
+import com.mauroave.whatsapp.tiponotificacion.TipoNotificacion;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 public class Notificacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @CreationTimestamp
+    @Column(name = "fecha_creacion")
+    private Date fechaCreacion;
+
     @ManyToOne
-    @JoinColumn(name = "persona_id")
-    private Persona persona;
+    @JoinColumn(name = "tipo_notificacion_id")
+    private TipoNotificacion tipoNotificacion;
 
     public Long getId() {
         return id;
@@ -21,11 +27,19 @@ public class Notificacion {
         this.id = id;
     }
 
-    public Persona getPersona() {
-        return persona;
+    public Date getFechaCreacion() {
+        return fechaCreacion;
     }
 
-    public void setPersona(Persona persona) {
-        this.persona = persona;
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public TipoNotificacion getTipoNotificacion() {
+        return tipoNotificacion;
+    }
+
+    public void setTipoNotificacion(TipoNotificacion tipoNotificacion) {
+        this.tipoNotificacion = tipoNotificacion;
     }
 }

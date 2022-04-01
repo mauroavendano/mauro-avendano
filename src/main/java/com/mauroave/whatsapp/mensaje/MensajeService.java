@@ -1,5 +1,16 @@
 package com.mauroave.whatsapp.mensaje;
 
+import com.mauroave.whatsapp.grupo.GrupoRepository;
+import com.mauroave.whatsapp.grupopersona.GrupoPersona;
+import com.mauroave.whatsapp.grupopersona.GrupoPersonaRepository;
+import com.mauroave.whatsapp.notificacion.Notificacion;
+import com.mauroave.whatsapp.notificacion.NotificacionRepository;
+import com.mauroave.whatsapp.notificacion.NotificacionResponse;
+import com.mauroave.whatsapp.notificacion.NotificacionService;
+import com.mauroave.whatsapp.notificacionpersona.NotificacionPersona;
+import com.mauroave.whatsapp.notificacionpersona.NotificacionPersonaService;
+import com.mauroave.whatsapp.persona.PersonaRepository;
+import com.mauroave.whatsapp.tiponotificacion.TipoNotificacionRepository;
 import com.mauroave.whatsapp.utils.ObjectUtils;
 import com.mauroave.whatsapp.utils.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +19,27 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
 public class MensajeService {
     @Autowired
     private MensajeRepository mensajeRepository;
+    @Autowired
+    private TipoNotificacionRepository tipoNotificacionRepository;
+    @Autowired
+    private NotificacionService notificacionService;
+    @Autowired
+    private NotificacionPersonaService notificacionPersonaService;
+    @Autowired
+    private GrupoPersonaRepository grupoPersonaRepository;
+    @Autowired
+    private GrupoRepository grupoRepository;
+    @Autowired
+    private NotificacionRepository notificacionRepository;
+    @Autowired
+    private PersonaRepository personaRepository;
 
     public PageResponse<List<Mensaje>> get(Integer pageNumber, Integer size){
         PageResponse<List<Mensaje>> page = new PageResponse();
@@ -25,18 +51,43 @@ public class MensajeService {
         return page;
     }
 
-    public Mensaje insert(MensajeConsume consume) {
+    public MensajeResponse insert(MensajeConsume consume) {
         Mensaje entity = this.transformEntity(consume);
-        this.mensajeRepository.save(entity);
-        return this.transformResponse(entity);
+        Mensaje entitySaved = this.mensajeRepository.save(entity);
+        //Una vez guardado el mensaje, debo enviar la notificacion a quien corresponda
+        Notificacion notificacion = new Notificacion();
+        //Si el id de grupo viene, es un tipo de notificacion de grupo. Caso contrario es individual
+        notificacion.setTipoNotificacion(consume.getGroup_reciever_id()!=null?this.tipoNotificacionRepository.findById(1L).orElse(null):this.tipoNotificacionRepository.findById(2L).orElse(null));
+        Notificacion notificacionSaved = this.notificacionRepository.save(notificacion);
+        //Si es grupal, debo enviar una notificacion masiva a cada miembro del grupo
+        if(consume.getGroup_reciever_id()!=null){
+            List<GrupoPersona> grupoPersonas = this.grupoPersonaRepository.findAllByGrupo(this.grupoRepository.findById(consume.getGroup_reciever_id()).orElse(null));
+            if(grupoPersonas != null && grupoPersonas.size()>0){
+                Iterator var1 = grupoPersonas.iterator();
+                List<NotificacionPersona> lista = new ArrayList<>();
+                while(var1.hasNext()) {
+                    GrupoPersona v = (GrupoPersona) var1.next();
+
+                    if(!v.getPersona().getId().equals(consume.getSender_id())){
+                        NotificacionPersona notificacionPersona = new NotificacionPersona();
+                        notificacionPersona.setNotificacion(notificacionSaved);
+                        notificacionPersona.setReciever(this.personaRepository.findById(v.getPersona().getId()).orElse(null));
+                        notificacionPersona.setSender(this.personaRepository.findById(consume.getSender_id()).orElse(null));
+                        lista.add(notificacionPersona);
+                    }
+                }
+                this.notificacionPersonaService.insertAll(lista);
+            }
+        }
+        return this.transformResponse(entitySaved);
     }
 
     private Mensaje transformEntity(MensajeConsume consume) {
         return ObjectUtils.convertValue(consume, Mensaje.class);
     }
 
-    public Mensaje transformResponse(Mensaje entity) {
-        return ObjectUtils.convertValue(entity, Mensaje.class);
+    public MensajeResponse transformResponse(Mensaje entity) {
+        return ObjectUtils.convertValue(entity, MensajeResponse.class);
     }
 
 }

@@ -26,6 +26,11 @@ insert  into grupo (id, nombre) values
 	('3', 'Chicos del barrio')
 ON CONFLICT DO NOTHING;
 
+insert  into tipo_notificacion (id, nombre) values
+	('1', 'Notificacion de grupo'),
+	('2', 'Notificacion personal')
+ON CONFLICT DO NOTHING;
+
 insert  into grupo_persona (id, persona_id, grupo_id) values
 	('1', 1, 1),
 	('2', 10, 1),

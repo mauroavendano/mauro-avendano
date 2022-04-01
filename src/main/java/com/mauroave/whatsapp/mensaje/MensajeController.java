@@ -1,6 +1,5 @@
 package com.mauroave.whatsapp.mensaje;
 
-import com.mauroave.whatsapp.persona.Persona;
 import com.mauroave.whatsapp.utils.ResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

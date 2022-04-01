@@ -1,6 +1,7 @@
 package com.mauroave.whatsapp.mensaje;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.mauroave.whatsapp.grupo.Grupo;
 import com.mauroave.whatsapp.persona.Persona;
 import org.hibernate.annotations.Type;
 
@@ -71,5 +72,15 @@ public class MensajeConsume {
             reciever.setId(getReciever_id());
         }
         return reciever;
+    }
+
+    @JsonGetter("groupReciever")
+    public Grupo getGroupReciever() {
+        Grupo grupo = null;
+        if(getSender_id() != null){
+            grupo = new Grupo();
+            grupo.setId(getReciever_id());
+        }
+        return grupo;
     }
 }
