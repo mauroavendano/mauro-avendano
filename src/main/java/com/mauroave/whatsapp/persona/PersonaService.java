@@ -24,4 +24,9 @@ public class PersonaService {
         return page;
     }
 
+    public Persona insert(Persona consume) {
+        Persona entity = this.personaRepository.save(consume);
+        return entity;
+    }
+
 }

@@ -11,7 +11,6 @@ public class Grupo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
-    private Integer maxNumberOfMembers = 255;
 
     public Long getId() {
         return id;
@@ -27,13 +26,5 @@ public class Grupo {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public Integer getMaxNumberOfMembers() {
-        return maxNumberOfMembers;
-    }
-
-    public void setMaxNumberOfMembers(Integer maxNumberOfMembers) {
-        this.maxNumberOfMembers = maxNumberOfMembers;
     }
 }
