@@ -1,4 +1,4 @@
-package com.mauroave.whatsapp.persona;
+package com.mauroave.whatsapp.grupo;
 
 import com.mauroave.whatsapp.utils.ResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,19 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/persona")
-public class PersonaController {
+@RequestMapping("/grupo")
+public class GrupoController {
     @Autowired
-    private PersonaService personaService;
-
-    /*@PostMapping({"/login"})
-    public ResponseEntity login(@RequestParam("p") Integer pageNumber, @RequestParam("s") Integer size, HttpServletRequest request) {
-        return ResponseEntity.ok((new ResponseBuilder()).makeSuccessResponse(request.getRequestURI(), this.logService.getLogs(pageNumber, size)));
-    }*/
+    private GrupoService grupoService;
 
     @GetMapping("")
     public ResponseEntity get(@RequestParam("p") Integer pageNumber, @RequestParam("s") Integer size, HttpServletRequest request) {
-        return ResponseEntity.ok((new ResponseBuilder()).makeSuccessResponse(request.getRequestURI(), this.personaService.get(pageNumber, size)));
+        return ResponseEntity.ok((new ResponseBuilder()).makeSuccessResponse(request.getRequestURI(), this.grupoService.get(pageNumber, size)));
     }
 
 }
