@@ -1,4 +1,4 @@
-package com.mauroave.whatsapp.persona;
+package com.mauroave.whatsapp.mensaje;
 
 import com.mauroave.whatsapp.utils.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PersonaService {
+public class MensajeService {
     @Autowired
-    private PersonaRepository personaRepository;
+    private MensajeRepository mensajeRepository;
 
-    public PageResponse<List<Persona>> get(Integer pageNumber, Integer size){
-        PageResponse<List<Persona>> page = new PageResponse();
+    public PageResponse<List<Mensaje>> get(Integer pageNumber, Integer size){
+        PageResponse<List<Mensaje>> page = new PageResponse();
         Pageable pageable = PageRequest.of(pageNumber, size);
-        List<Persona> result = new ArrayList<Persona>();
-        this.personaRepository.findAll(pageable).iterator().forEachRemaining(result::add);
+        List<Mensaje> result = new ArrayList<Mensaje>();
+        this.mensajeRepository.findAll(pageable).iterator().forEachRemaining(result::add);
         page.setElements(result);
-        page.setLength(this.personaRepository.count());
+        page.setLength(this.mensajeRepository.count());
         return page;
     }
 

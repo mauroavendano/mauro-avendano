@@ -1,4 +1,4 @@
-package com.mauroave.whatsapp.persona;
+package com.mauroave.whatsapp.notificacion;
 
 import com.mauroave.whatsapp.utils.ResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/persona")
-public class PersonaController {
+@RequestMapping("/notificacion")
+public class NotificacionController {
     @Autowired
-    private PersonaService personaService;
+    private NotificacionService notificacionService;
 
     @GetMapping("")
     public ResponseEntity get(@RequestParam("p") Integer pageNumber, @RequestParam("s") Integer size, HttpServletRequest request) {
-        return ResponseEntity.ok((new ResponseBuilder()).makeSuccessResponse(request.getRequestURI(), this.personaService.get(pageNumber, size)));
+        return ResponseEntity.ok((new ResponseBuilder()).makeSuccessResponse(request.getRequestURI(), this.notificacionService.get(pageNumber, size)));
     }
 
 }
