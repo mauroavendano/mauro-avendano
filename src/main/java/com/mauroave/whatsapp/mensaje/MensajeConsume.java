@@ -67,7 +67,7 @@ public class MensajeConsume {
     @JsonGetter("reciever")
     public Persona getReciever() {
         Persona reciever = null;
-        if(getSender_id() != null){
+        if(getReciever_id() != null){
             reciever = new Persona();
             reciever.setId(getReciever_id());
         }
@@ -77,9 +77,9 @@ public class MensajeConsume {
     @JsonGetter("groupReciever")
     public Grupo getGroupReciever() {
         Grupo grupo = null;
-        if(getSender_id() != null){
+        if(getGroup_reciever_id() != null){
             grupo = new Grupo();
-            grupo.setId(getReciever_id());
+            grupo.setId(getGroup_reciever_id());
         }
         return grupo;
     }

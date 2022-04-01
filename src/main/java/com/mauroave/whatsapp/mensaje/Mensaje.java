@@ -34,7 +34,6 @@ public class Mensaje {
     @Lob
     @Type(type = "org.hibernate.type.TextType")
     private String content;
-    private Boolean leido;
 
     public Long getId() {
         return id;
@@ -84,11 +83,4 @@ public class Mensaje {
         this.content = content;
     }
 
-    public Boolean getLeido() {
-        return leido;
-    }
-
-    public void setLeido(Boolean leido) {
-        this.leido = leido;
-    }
 }

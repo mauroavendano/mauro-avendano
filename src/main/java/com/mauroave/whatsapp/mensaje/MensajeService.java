@@ -10,6 +10,9 @@ import com.mauroave.whatsapp.notificacion.NotificacionService;
 import com.mauroave.whatsapp.notificacionpersona.NotificacionPersona;
 import com.mauroave.whatsapp.notificacionpersona.NotificacionPersonaService;
 import com.mauroave.whatsapp.persona.PersonaRepository;
+import com.mauroave.whatsapp.personamensaje.PersonaMensaje;
+import com.mauroave.whatsapp.personamensaje.PersonaMensajeRepository;
+import com.mauroave.whatsapp.personamensaje.PersonaMensajeService;
 import com.mauroave.whatsapp.tiponotificacion.TipoNotificacionRepository;
 import com.mauroave.whatsapp.utils.ObjectUtils;
 import com.mauroave.whatsapp.utils.PageResponse;
@@ -40,7 +43,17 @@ public class MensajeService {
     private NotificacionRepository notificacionRepository;
     @Autowired
     private PersonaRepository personaRepository;
+    @Autowired
+    private PersonaMensajeService personaMensajeService;
+    @Autowired
+    private PersonaMensajeRepository personaMensajeRepository;
 
+    /**
+     * Obtengo todos los mensajes paginados
+     * @param pageNumber
+     * @param size
+     * @return
+     */
     public PageResponse<List<Mensaje>> get(Integer pageNumber, Integer size){
         PageResponse<List<Mensaje>> page = new PageResponse();
         Pageable pageable = PageRequest.of(pageNumber, size);
@@ -49,6 +62,29 @@ public class MensajeService {
         page.setElements(result);
         page.setLength(this.mensajeRepository.count());
         return page;
+    }
+
+    /**
+     * Obtengo los mensajes no leidos de una persona y los marco leidos
+     * @param persona_id
+     * @return
+     */
+    public List<Mensaje> verNoLeidos(Long persona_id){
+        PageResponse<List<Mensaje>> page = new PageResponse();
+        List<Mensaje> result = new ArrayList<Mensaje>();
+        List<PersonaMensaje> noLeidos = new ArrayList<PersonaMensaje>();
+        noLeidos = this.personaMensajeRepository.findAllByRecieverAndLeido(this.personaRepository.findById(persona_id).orElse(null), false);
+        if(noLeidos!=null && noLeidos.size()>0){
+            Iterator var1 = noLeidos.iterator();
+
+            while(var1.hasNext()) {
+                PersonaMensaje noLeido = (PersonaMensaje) var1.next();
+                result.add(noLeido.getMensaje());
+                noLeido.setLeido(true);
+                this.personaMensajeRepository.save(noLeido);
+            }
+        }
+        return result;
     }
 
     public MensajeResponse insert(MensajeConsume consume) {
@@ -65,6 +101,7 @@ public class MensajeService {
             if(grupoPersonas != null && grupoPersonas.size()>0){
                 Iterator var1 = grupoPersonas.iterator();
                 List<NotificacionPersona> lista = new ArrayList<>();
+                List<PersonaMensaje> listaPersonaMensaje = new ArrayList<>();
                 while(var1.hasNext()) {
                     GrupoPersona v = (GrupoPersona) var1.next();
 
@@ -74,10 +111,30 @@ public class MensajeService {
                         notificacionPersona.setReciever(this.personaRepository.findById(v.getPersona().getId()).orElse(null));
                         notificacionPersona.setSender(this.personaRepository.findById(consume.getSender_id()).orElse(null));
                         lista.add(notificacionPersona);
+
+                        //Guardo ademas el mensaje como no leido para cada receptor
+                        PersonaMensaje personaMensaje = new PersonaMensaje();
+                        personaMensaje.setMensaje(entitySaved);
+                        personaMensaje.setLeido(false);
+                        personaMensaje.setReciever(this.personaRepository.findById(v.getPersona().getId()).orElse(null));
+                        listaPersonaMensaje.add(personaMensaje);
                     }
                 }
                 this.notificacionPersonaService.insertAll(lista);
+                this.personaMensajeService.insertAll(listaPersonaMensaje);
             }
+        }else{
+            NotificacionPersona notificacionPersona2 = new NotificacionPersona();
+            notificacionPersona2.setNotificacion(notificacionSaved);
+            notificacionPersona2.setReciever(this.personaRepository.findById(consume.getReciever_id()).orElse(null));
+            notificacionPersona2.setSender(this.personaRepository.findById(consume.getSender_id()).orElse(null));
+            this.notificacionPersonaService.insert(notificacionPersona2);
+
+            PersonaMensaje personaMensaje2 = new PersonaMensaje();
+            personaMensaje2.setMensaje(entitySaved);
+            personaMensaje2.setLeido(false);
+            personaMensaje2.setReciever(this.personaRepository.findById(consume.getReciever_id()).orElse(null));
+            this.personaMensajeRepository.save(personaMensaje2);
         }
         return this.transformResponse(entitySaved);
     }

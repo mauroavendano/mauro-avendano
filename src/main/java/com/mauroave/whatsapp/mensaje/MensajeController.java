@@ -14,13 +14,18 @@ public class MensajeController {
     private MensajeService mensajeService;
 
     @GetMapping("")
-    public ResponseEntity get(@RequestParam("p") Integer pageNumber, @RequestParam("s") Integer size, HttpServletRequest request) {
+    public ResponseEntity getAll(@RequestParam("p") Integer pageNumber, @RequestParam("s") Integer size, HttpServletRequest request) {
         return ResponseEntity.ok((new ResponseBuilder()).makeSuccessResponse(request.getRequestURI(), this.mensajeService.get(pageNumber, size)));
     }
 
     @PostMapping({""})
     public ResponseEntity save(@RequestBody MensajeConsume consume, HttpServletRequest request) {
         return ResponseEntity.ok((new ResponseBuilder<>()).makeSuccessResponse(request.getRequestURI(), this.mensajeService.insert(consume)));
+    }
+
+    @GetMapping("/no-leidos")
+    public ResponseEntity getNoLeidos(@RequestParam("persona_id") Long persona_id, HttpServletRequest request) {
+        return ResponseEntity.ok((new ResponseBuilder()).makeSuccessResponse(request.getRequestURI(), this.mensajeService.verNoLeidos(persona_id)));
     }
 
 }
