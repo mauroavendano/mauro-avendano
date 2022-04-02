@@ -13,8 +13,8 @@ import javax.validation.constraints.NotNull;
 public class MensajeConsume {
     @NotNull(message = "El sender no puede ser nulo")
     private Long sender_id;
-    @NotNull(message = "El reciever no puede ser nulo")
     private Long reciever_id;
+    @NotNull(message = "El grupo no puede ser nulo")
     private Long group_reciever_id;
     @NotNull(message = "El contenido del mensaje no puede ser nulo")
     @NotEmpty(message = "El contenido del mensaje no puede ser vacio.")
